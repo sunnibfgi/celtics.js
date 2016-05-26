@@ -2,7 +2,6 @@
 // a very simple calendar picker
 (function(global) {
   'use strict';
-    
   var o = Object.create(null, {
       
     isLeapYear: {
@@ -16,23 +15,25 @@
     tplCaption: {
       enumerable: true,
       writable: true,
-      value: '<table cellspacing=0 cellpadding=0 class="d-caption">\
-                <tr>\
-                    <td><span id="d-m-y"></span></td>\
-                    <td class="d-pointer"><span class="d-prev">&lt;</span><span class="d-next">&gt;</span></td>\
-                </tr>\
-             </table>'
+      value: 
+        '<table cellspacing=0 cellpadding=0 class="d-caption">\
+          <tr>\
+            <td><span id="d-m-y"></span></td>\
+            <td class="d-pointer"><span class="d-prev">&lt;</span><span class="d-next">&gt;</span></td>\
+          </tr>\
+        </table>'
      },
       
     tplTable: {
       enumerable: true,
       writable: true,
-      value: '<table cellspacing=0 cellpadding=0 class="d-table" id="d-table">\
-                <thead>\
-                    <tr id="d-week"></tr>\
-                </thead>\
-                <tbody id="d-body"></tbody>\
-              </table>'
+      value: 
+        '<table cellspacing=0 cellpadding=0 class="d-table" id="d-table">\
+          <thead>\
+            <tr id="d-week"></tr>\
+          </thead>\
+          <tbody id="d-body"></tbody>\
+        </table>'
       }
   });
 
