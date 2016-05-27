@@ -1,10 +1,6 @@
-// celtics.js
-// a very simple calendar picker
 (function(global) {
   'use strict';
-    
   var o = Object.create(null, {
-      
     isLeapYear: {
       enumerable: true,
       writable: true,
@@ -12,7 +8,6 @@
         return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
       }
     },
-      
     tplCaption: {
       enumerable: true,
       writable: true,
@@ -22,8 +17,7 @@
                     <td class="d-pointer"><span class="d-prev">&lt;</span><span class="d-next">&gt;</span></td>\
                 </tr>\
              </table>'
-     },
-      
+    },
     tplTable: {
       enumerable: true,
       writable: true,
@@ -33,7 +27,7 @@
                 </thead>\
                 <tbody id="d-body"></tbody>\
               </table>'
-      }
+    }
   });
 
   function $(selector) {
@@ -51,6 +45,7 @@
     this.month = d.getMonth();
     this.weekName = Calendar.language[options.lan || 'en'].weekName;
     this.monthName = Calendar.language[options.lan || 'en'].monthName;
+    this.container = document.createElement('div');
     this.renderOnce = false;
     this.init();
   }
@@ -60,12 +55,12 @@
     init: function() {
       var _this = this;
       this.setCurrentDate();
-      $('.d-next').onclick = function() {
-        _this.setNextDate();
-      };
-      $('.d-prev').onclick = function() {
-        _this.setPrevDate();
-      }
+      $('.d-next').addEventListener('click', function(e){
+         _this.setNextDate(); 
+      });
+      $('.d-prev').addEventListener('click', function(e){
+         _this.setPrevDate(); 
+      });
     },
       
     getDaysInMonth: function(year) {
@@ -75,10 +70,9 @@
     dateRender: function(year, month) {
       if (!this.renderOnce) {
         var td = [];
-        var div = document.createElement('div');
-        div.setAttribute('id', 'calendar-content');
-        div.innerHTML = o.tplCaption + o.tplTable;
-        document.body.appendChild(div);
+        this.container.setAttribute('id', 'calendar-content');
+        this.container.innerHTML = o.tplCaption + o.tplTable;
+        document.body.appendChild(this.container);
         for (var i = 0; i < this.weekName.length; i++) {
           td.push('<th>' + this.weekName[i][0] + '</th>');
         }
@@ -91,7 +85,7 @@
       var nextFillDays = 0,days = 0;
       for (var i = 0; i < this.weekName.length - 1; i++) {
         tr.push('<tr>');
-        for (var j = 0; j < this.weekName.length; j++) {
+        for (var j = 0,len = this.weekName.length; j < len; j++) {
           if (prevFillDays <= this.getDaysInMonth(year)[month ? month - 1 : 0]) {
             tr.push('<td class="d-off-month">' + prevFillDays + '</td>');
             prevFillDays++;
@@ -154,7 +148,7 @@
       monthName: ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre']
     }
   };
-    
+  //transport
   if (!global.Calendar) {
     global.Calendar = Calendar;
   }
