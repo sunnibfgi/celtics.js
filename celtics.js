@@ -94,7 +94,7 @@
           } else {
             if (days < this.getDaysInMonth(year)[month]) {
               days++;
-              var today = this.isToday(year, month, days) ? 'd-today' : '';
+              var today = this.isToday(year, month, days) ? ' d-today' : '';
               tr.push('<td class="d-active-month ' + today + '">' + days + '</td>');
             } else {
               nextFillDays++;
