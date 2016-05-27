@@ -148,9 +148,10 @@
       monthName: ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre']
     }
   };
-  //transport
+    
   if (!global.Calendar) {
     global.Calendar = Calendar;
   }
     
 })(window);
+Calendar();
