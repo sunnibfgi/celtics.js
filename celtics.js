@@ -1,5 +1,7 @@
+// a very simple calendar picker
 (function(global) {
   'use strict';
+    
   var o = Object.create(null, {
     isLeapYear: {
       enumerable: true,
@@ -148,7 +150,7 @@
       monthName: ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre']
     }
   };
-    
+  // transport
   if (!global.Calendar) {
     global.Calendar = Calendar;
   }
