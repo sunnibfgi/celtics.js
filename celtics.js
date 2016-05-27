@@ -92,7 +92,7 @@
       var nextFillDays = 0,days = 0;
       for (var i = 0; i < this.weekName.length - 1; i++) {
         tr.push('<tr>');
-        for (var j = 0; j < this.weekName.length; j++) {
+        for (var j = 0, len = this.weekName.length; j < len; j++) {
           if (prevFillDays <= this.getDaysInMonth(year)[month ? month - 1 : 0]) {
             tr.push('<td class="d-off-month">' + prevFillDays + '</td>');
             prevFillDays++;
