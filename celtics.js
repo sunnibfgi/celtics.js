@@ -77,9 +77,11 @@
         _this.setPrevDate();
       };
     },
+    
     getDaysInMonth: function(year) {
       return [31, (o.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     },
+    
     addContainer: function() {
       var div = document.createElement('div');
       div.setAttribute('id', this.id);
@@ -89,6 +91,7 @@
       this.container = div;
       this.dateWeekRender();
     },
+    
     dateWeekRender: function() {
       var td = [];
       for (var i = 0; i < this.weekName.length; i++) {
@@ -96,10 +99,12 @@
       }
       q(this.container, '.d-week').innerHTML = td.join('');
     },
+    
     isToday: function(year, month, date) {
       var d = new Date;
       return year === d.getFullYear() && month === d.getMonth() && date === d.getDate();
     },
+    
     dateMonthDaysRender: function(year, month) {
       var tr = [];
       var firstDay = new Date(year, month, 1).getDay();
@@ -128,14 +133,17 @@
       q(this.container, '.d-m-y').innerHTML = this.monthName[month] + ' ' + this.year;
       q(this.container, '.d-body').innerHTML = tr.join('');
     },
+    
     setCurrentDate: function() {
       this.dateMonthDaysRender(this.year, this.month);
     },
+    
     setPrevDate: function() {
       this.month -= 1;
       this.month < 0 && (this.year--, this.month = 11);
       this.setCurrentDate(this.year, this.month);
     },
+    
     setNextDate: function() {
       this.month += 1;
       this.month > 11 && (this.year++, this.month = 0);
@@ -143,6 +151,7 @@
     }
   };
   Calendar.prototype = o.proto;
+  
   Calendar.language = {
     'en': {
       weekName: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
