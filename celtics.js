@@ -1,7 +1,7 @@
-// a very simple calendar picker
+// a very simple datepicker
+// month range `0-11`
 (function(global) {
   'use strict';
-    
   var o = Object.create(null, {
     isLeapYear: {
       enumerable: true,
@@ -10,84 +10,105 @@
         return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
       }
     },
-    tplCaption: {
+    tpl: {
       enumerable: true,
       writable: true,
-      value: '<table cellspacing=0 cellpadding=0 class="d-caption">\
-                <tr>\
-                    <td><span id="d-m-y"></span></td>\
-                    <td class="d-pointer"><span class="d-prev">&lt;</span><span class="d-next">&gt;</span></td>\
-                </tr>\
-             </table>'
-    },
-    tplTable: {
-      enumerable: true,
-      writable: true,
-      value: '<table cellspacing=0 cellpadding=0 class="d-table" id="d-table">\
-                <thead>\
-                    <tr id="d-week"></tr>\
-                </thead>\
-                <tbody id="d-body"></tbody>\
-              </table>'
+      value: {
+        tplCaption: 
+          '<table cellspacing=0 cellpadding=0 class="d-caption">\
+            <tr>\
+              <td><span class="d-m-y"></span></td>\
+              <td class="d-pointer"><span class="d-prev">&lt;</span><span class="d-next">&gt;</span></td>\
+            </tr>\
+          </table>',
+        tplMain: 
+          '<table cellspacing=0 cellpadding=0 class="d-table" id="d-table">\
+            <thead>\
+              <tr class="d-week"></tr>\
+            </thead>\
+            <tbody class="d-body"></tbody>\
+          </table>'
+      }
     }
   });
 
-  function $(selector) {
-    var el = document.querySelectorAll(selector);
-    return el.length > 1 ? el : el[0];
+  function $(id) {
+    return document.getElementById(id);
+  }
+
+  function q(id, selector) {
+    var el = id.querySelectorAll(selector),
+      len = el.length;
+    return len > 1 ? el : el[0];
+  }
+
+  function extend(target, source) {
+    for (var prop in source) {
+      target[prop] = source[prop];
+    }
+    return target;
   }
 
   function Calendar(options) {
     var d = new Date;
-    options || (options = {});
     if (!(this instanceof Calendar)) {
       return new Calendar(options);
     }
-    this.year = d.getFullYear();
-    this.month = d.getMonth();
+    this.options = extend({}, options || (options = {}));
+    this.year = this.options.year || d.getFullYear();
+    this.month = this.options.month || d.getMonth();
     this.weekName = Calendar.language[options.lan || 'en'].weekName;
     this.monthName = Calendar.language[options.lan || 'en'].monthName;
-    this.container = document.createElement('div');
-    this.renderOnce = false;
+    this.id = this.options.id || 'calendar-container';
+    this.container = $(this.id);
     this.init();
   }
-    
   o.proto = {
     constructor: Calendar,
     init: function() {
       var _this = this;
+      if (this.container) return;
+      this.addContainer();
       this.setCurrentDate();
-      $('.d-next').addEventListener('click', function(e){
-         _this.setNextDate(); 
-      });
-      $('.d-prev').addEventListener('click', function(e){
-         _this.setPrevDate(); 
-      });
+      q(this.container, '.d-next').onclick = function() {
+        _this.setNextDate();
+      };
+      q(this.container, '.d-prev').onclick = function() {
+        _this.setPrevDate();
+      };
     },
-      
     getDaysInMonth: function(year) {
       return [31, (o.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     },
-      
-    dateRender: function(year, month) {
-      if (!this.renderOnce) {
-        var td = [];
-        this.container.setAttribute('id', 'calendar-content');
-        this.container.innerHTML = o.tplCaption + o.tplTable;
-        document.body.appendChild(this.container);
-        for (var i = 0; i < this.weekName.length; i++) {
-          td.push('<th>' + this.weekName[i][0] + '</th>');
-        }
-        $('#d-week').innerHTML = td.join('');
-        this.renderOnce = true;
+    addContainer: function() {
+      var div = document.createElement('div');
+      div.setAttribute('id', this.id);
+      div.className = this.id;
+      div.innerHTML = o.tpl.tplCaption + o.tpl.tplMain;
+      document.body.appendChild(div);
+      this.container = div;
+      this.dateWeekRender();
+    },
+    dateWeekRender: function() {
+      var td = [];
+      for (var i = 0; i < this.weekName.length; i++) {
+        td.push('<th>' + this.weekName[i][0] + '</th>');
       }
+      q(this.container, '.d-week').innerHTML = td.join('');
+    },
+    isToday: function(year, month, date) {
+      var d = new Date;
+      return year === d.getFullYear() && month === d.getMonth() && date === d.getDate();
+    },
+    dateMonthDaysRender: function(year, month) {
       var tr = [];
       var firstDay = new Date(year, month, 1).getDay();
       var prevFillDays = this.getDaysInMonth(year)[month ? month - 1 : 0] - (firstDay ? (firstDay - 1) : this.weekName.length - 1);
-      var nextFillDays = 0,days = 0;
+      var nextFillDays = 0,
+        days = 0;
       for (var i = 0; i < this.weekName.length - 1; i++) {
         tr.push('<tr>');
-        for (var j = 0,len = this.weekName.length; j < len; j++) {
+        for (var j = 0, len = this.weekName.length; j < len; j++) {
           if (prevFillDays <= this.getDaysInMonth(year)[month ? month - 1 : 0]) {
             tr.push('<td class="d-off-month">' + prevFillDays + '</td>');
             prevFillDays++;
@@ -102,36 +123,26 @@
             }
           }
         }
-        tr.push('</tr>');
       }
-      $('#d-m-y').innerHTML = this.monthName[month] + ' ' + this.year;
-      $('#d-body').innerHTML = tr.join('');
+      tr.push('</tr>');
+      q(this.container, '.d-m-y').innerHTML = this.monthName[month] + ' ' + this.year;
+      q(this.container, '.d-body').innerHTML = tr.join('');
     },
-      
-    isToday: function(year, month, date) {
-      var d = new Date;
-      return year === d.getFullYear() && month === d.getMonth() && date === d.getDate();
-    },
-      
     setCurrentDate: function() {
-      this.dateRender(this.year, this.month);
+      this.dateMonthDaysRender(this.year, this.month);
     },
-      
     setPrevDate: function() {
       this.month -= 1;
       this.month < 0 && (this.year--, this.month = 11);
-      this.dateRender(this.year, this.month);
+      this.setCurrentDate(this.year, this.month);
     },
-      
     setNextDate: function() {
       this.month += 1;
       this.month > 11 && (this.year++, this.month = 0);
-      this.dateRender(this.year, this.month);
+      this.setCurrentDate(this.year, this.month);
     }
   };
-    
   Calendar.prototype = o.proto;
-    
   Calendar.language = {
     'en': {
       weekName: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
@@ -150,10 +161,10 @@
       monthName: ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre']
     }
   };
+    
   // transport
   if (!global.Calendar) {
     global.Calendar = Calendar;
   }
     
 })(window);
-
