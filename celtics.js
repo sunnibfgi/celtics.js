@@ -48,110 +48,133 @@
     }
     return target;
   }
-
-  function Calendar(options) {
-    var d = new Date;
-    if (!(this instanceof Calendar)) {
-      return new Calendar(options);
-    }
-    this.options = extend({}, options || (options = {}));
-    this.year = this.options.year || d.getFullYear();
-    this.month = this.options.month || d.getMonth();
-    this.weekName = Calendar.language[options.lan || 'en'].weekName;
-    this.monthName = Calendar.language[options.lan || 'en'].monthName;
-    this.id = this.options.id || 'calendar-container';
-    this.container = $(this.id);
-    this.init();
+function Calendar(options) {
+  var d = new Date;
+  if (!(this instanceof Calendar)) {
+    return new Calendar(options);
   }
-  o.proto = {
-    constructor: Calendar,
-    init: function() {
-      var _this = this;
-      if (this.container) return;
-      this.addContainer();
-      this.setCurrentDate();
-      q(this.container, '.d-next').onclick = function() {
-        _this.setNextDate();
-      };
-      q(this.container, '.d-prev').onclick = function() {
-        _this.setPrevDate();
-      };
-    },
-    
-    getDaysInMonth: function(year) {
-      return [31, (o.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-    },
-    
-    addContainer: function() {
-      var div = document.createElement('div');
-      div.setAttribute('id', this.id);
-      div.className = this.id;
-      div.innerHTML = o.tpl.tplCaption + o.tpl.tplMain;
-      document.body.appendChild(div);
-      this.container = div;
-      this.dateWeekRender();
-    },
-    
-    dateWeekRender: function() {
-      var td = [];
-      for (var i = 0; i < this.weekName.length; i++) {
-        td.push('<th>' + this.weekName[i][0] + '</th>');
-      }
-      q(this.container, '.d-week').innerHTML = td.join('');
-    },
-    
-    isToday: function(year, month, date) {
-      var d = new Date;
+  this.options = extend({}, options || (options = {}));
+  this.year = this.options.year || d.getFullYear();
+  this.month = this.options.month || d.getMonth();
+  this.weekName = Calendar.language[options.lan || 'en'].weekName;
+  this.monthName = Calendar.language[options.lan || 'en'].monthName;
+  this.id = this.options.id || 'calendar-container';
+  this.container = $(this.id);
+  this.init();
+}
+o.proto = {
+  constructor: Calendar,
+  init: function() {
+    var _this = this;
+    if (this.container) return;
+    this.addContainer();
+    this.setCurrentDate();
+    this.containerEventHandler();
+  },
+  getDaysInMonth: function(year) {
+    return [31, (o.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  },
+  addContainer: function() {
+    var div = document.createElement('div');
+    div.setAttribute('id', this.id);
+    div.className = this.id;
+    this.html(div, o.tpl.tplCaption + o.tpl.tplMain);
+    document.body.appendChild(div);
+    this.container = div;
+    this.dateWeekRender();
+  },
+  dateWeekRender: function() {
+    var td = [];
+    for (var i = 0; i < this.weekName.length; i++) {
+      td.push('<th>' + this.weekName[i][0] + '</th>');
+    }
+    this.html(q(this.container, '.d-week'), td.join(''));
+  },
+  setToday: function(year, month, date) {
+    var d = new Date;
+    function isToday() {
       return year === d.getFullYear() && month === d.getMonth() && date === d.getDate();
-    },
-    
-    dateMonthDaysRender: function(year, month) {
-      var tr = [];
-      var firstDay = new Date(year, month, 1).getDay();
-      var prevFillDays = this.getDaysInMonth(year)[month ? month - 1 : 0] - (firstDay ? (firstDay - 1) : this.weekName.length - 1);
-      var nextFillDays = 0,
-        days = 0;
-      for (var i = 0; i < this.weekName.length - 1; i++) {
-        tr.push('<tr>');
-        for (var j = 0, len = this.weekName.length; j < len; j++) {
-          if (prevFillDays <= this.getDaysInMonth(year)[month ? month - 1 : 0]) {
-            tr.push('<td class="d-off-month">' + prevFillDays + '</td>');
-            prevFillDays++;
+    }
+    return isToday() ? ' d-today' : '';
+  },
+
+  html: function(el, html) {
+    return el.innerHTML = html;
+  },
+
+  dateMonthDaysRender: function(year, month) {
+    var tr = [];
+    var firstDay = new Date(year, month, 1).getDay();
+    var prevFillDays = this.getDaysInMonth(year)[month ? month - 1 : 0] - (firstDay ? (firstDay - 1) : this.weekName.length - 1);
+    var nextFillDays = 0,
+      days = 0;
+    for (var i = 0; i < this.weekName.length - 1; i++) {
+      tr.push('<tr>');
+      for (var j = 0, len = this.weekName.length; j < len; j++) {
+        if (prevFillDays <= this.getDaysInMonth(year)[month ? month - 1 : 0]) {
+          tr.push('<td class="d-off-month" data-month="prev">' + prevFillDays + '</td>');
+          prevFillDays++;
+        } else {
+          if (days < this.getDaysInMonth(year)[month]) {
+            days++;
+            tr.push('<td class="d-active-month' + this.setToday(year, month, days) + '">' + days + '</td>');
           } else {
-            if (days < this.getDaysInMonth(year)[month]) {
-              days++;
-              var today = this.isToday(year, month, days) ? ' d-today' : '';
-              tr.push('<td class="d-active-month ' + today + '">' + days + '</td>');
-            } else {
-              nextFillDays++;
-              tr.push('<td class="d-off-month">' + nextFillDays + '</td>');
-            }
+            nextFillDays++;
+            tr.push('<td class="d-off-month" data-month="next">' + nextFillDays + '</td>');
           }
         }
       }
-      tr.push('</tr>');
-      q(this.container, '.d-m-y').innerHTML = this.monthName[month] + ' ' + this.year;
-      q(this.container, '.d-body').innerHTML = tr.join('');
-    },
-    
-    setCurrentDate: function() {
-      this.dateMonthDaysRender(this.year, this.month);
-    },
-    
-    setPrevDate: function() {
-      this.month -= 1;
-      this.month < 0 && (this.year--, this.month = 11);
-      this.setCurrentDate(this.year, this.month);
-    },
-    
-    setNextDate: function() {
-      this.month += 1;
-      this.month > 11 && (this.year++, this.month = 0);
-      this.setCurrentDate(this.year, this.month);
     }
-  };
+    tr.push('</tr>');
+    this.html(q(this.container, '.d-m-y'), this.monthName[month] + ' ' + this.year);
+    this.html(q(this.container, '.d-body'), tr.join(''));
+  },
+
+  setCurrentDate: function() {
+    this.dateMonthDaysRender(this.year, this.month);
+  },
+
+  setPrevDate: function() {
+    this.month -= 1;
+    this.month < 0 && (this.year--, this.month = 11);
+    this.setCurrentDate(this.year, this.month);
+  },
+
+  setNextDate: function() {
+    this.month += 1;
+    this.month > 11 && (this.year++, this.month = 0);
+    this.setCurrentDate(this.year, this.month);
+  },
+
+  containerEventHandler: function() {
+    var body = q(this.container, '.d-body'),
+      next = q(this.container, '.d-next'),
+      prev = q(this.container, '.d-prev'),
+      _this = this;
+    function triggerDateRender(e) {
+      var target = e.target;
+      var attr = target.getAttribute('data-month');
+      switch (attr) {
+        case 'next':
+          _this.setNextDate();
+          break;
+        case 'prev':
+          _this.setPrevDate();
+          break;
+        default:
+      }
+    }
+    next.addEventListener('click', function() {
+      _this.setNextDate();
+    });
+    prev.addEventListener('click', function() {
+      _this.setPrevDate();
+    });
+    body.addEventListener('click', triggerDateRender);
+  }
+};
+    
   Calendar.prototype = o.proto;
-  
   Calendar.language = {
     'en': {
       weekName: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
