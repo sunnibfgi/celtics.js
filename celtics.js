@@ -48,6 +48,7 @@
     }
     return target;
   }
+
 function Calendar(options) {
   var d = new Date;
   if (!(this instanceof Calendar)) {
@@ -62,18 +63,20 @@ function Calendar(options) {
   this.container = $(this.id);
   this.init();
 }
+
 o.proto = {
   constructor: Calendar,
   init: function() {
-    var _this = this;
     if (this.container) return;
     this.addContainer();
     this.setCurrentDate();
     this.containerEventHandler();
   },
+
   getDaysInMonth: function(year) {
     return [31, (o.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
   },
+
   addContainer: function() {
     var div = document.createElement('div');
     div.setAttribute('id', this.id);
@@ -82,7 +85,8 @@ o.proto = {
     document.body.appendChild(div);
     this.container = div;
     this.dateWeekRender();
-  },
+  }, 
+
   dateWeekRender: function() {
     var td = [];
     for (var i = 0; i < this.weekName.length; i++) {
