@@ -103,7 +103,9 @@ o.proto = {
   },
 
   html: function(el, html) {
-    return el.innerHTML = html;
+    if(html)
+      return el.innerHTML = html;
+    return el.innerHTML;
   },
 
   dateMonthDaysRender: function(year, month) {
