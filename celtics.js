@@ -120,14 +120,14 @@ o.proto = {
         if (prevFillDays <= this.getDaysInMonth(year)[month ? month - 1 : 0]) {
           tr.push('<td class="d-off-month" data-month="prev">' + prevFillDays + '</td>');
           prevFillDays++;
-        } else {
-          if (days < this.getDaysInMonth(year)[month]) {
+        } 
+        else if (days < this.getDaysInMonth(year)[month]) {
             days++;
             tr.push('<td class="d-active-month' + this.setToday(year, month, days) + '">' + days + '</td>');
-          } else {
+        } 
+        else {
             nextFillDays++;
             tr.push('<td class="d-off-month" data-month="next">' + nextFillDays + '</td>');
-          }
         }
       }
     }
