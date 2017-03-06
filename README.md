@@ -1,2 +1,2 @@
 # celtics.js
-a simple datepicker. but incomplete... Edit
+a simple datepicker. but not yet perfect...
