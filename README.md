@@ -1,2 +1,2 @@
 # celtics.js
-a simple calendar picker
+a simple datepicker. but incomplete... Edit
