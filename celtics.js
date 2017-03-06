@@ -109,14 +109,16 @@ o.proto = {
   },
 
   dateMonthDaysRender: function(year, month) {
-    var tr = [];
-    var firstDay = new Date(year, month, 1).getDay();
-    var prevFillDays = this.getDaysInMonth(year)[month ? month - 1 : 0] - (firstDay ? (firstDay - 1) : this.weekName.length - 1);
-    var nextFillDays = 0,
-      days = 0;
-    for (var i = 0; i < this.weekName.length - 1; i++) {
+    var tr = [],
+        days = 0,
+        nextFillDays = 0,
+        weekLength = this.weekName.length,
+        firstDay = new Date(year, month, 1).getDay(),
+        prevFillDays = this.getDaysInMonth(year)[month ? month - 1 : 0] - (firstDay ? (firstDay - 1) : len - 1);
+    
+    for (var i = 0; i < weekLength - 1; i++) {
       tr.push('<tr>');
-      for (var j = 0, len = this.weekName.length; j < len; j++) {
+      for (var j = 0, len = weekLength; j < len; j++) {
         if (prevFillDays <= this.getDaysInMonth(year)[month ? month - 1 : 0]) {
           tr.push('<td class="d-off-month" data-month="prev">' + prevFillDays + '</td>');
           prevFillDays++;
